@@ -79,44 +79,15 @@ fun Project.fatJar() = also {
     it.dependencies {
         implementation(api)
         implementation(dist)
-        nms.forEach {
-            implementation(project(":nms:${it.name}", configuration = "reobf"))
+        nms.forEach { p ->
+            implementation(project(":nms:${p.name}", configuration = "reobf"))
         }
     }
 }
 
 listOf(
-    project("test-plugin:library").runPaper().also {
-        it.tasks {
-            runServer {
-                layout.buildDirectory.dir("libs").map { d ->
-                    d.asFile
-                }.orNull?.listFiles()?.firstOrNull { f ->
-                    f.nameWithoutExtension.endsWith(project.version.toString())
-                }?.let { jar ->
-                    pluginJars(jar)
-                }
-            }
-            jar {
-                manifest {
-                    attributes["paperweight-mappings-namespace"] = "spigot"
-                }
-            }
-        }
-    },
-    project("test-plugin:shade").runPaper().shadowJar().also {
-        it.tasks {
-            jar {
-                finalizedBy(shadowJar)
-            }
-            shadowJar {
-                archiveClassifier = ""
-                manifest {
-                    attributes["paperweight-mappings-namespace"] = "spigot"
-                }
-            }
-        }
-    }
+    project("test-plugin:library").runPaper(),
+    project("test-plugin:shade").runPaper().shadowJar()
 ).forEach {
     it.paper()
         .fatJar()

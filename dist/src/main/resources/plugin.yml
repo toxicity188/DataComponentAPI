@@ -1,0 +1,7 @@
+main: kr.toxicity.libraries.datacomponent.DataComponentAPIBukkit
+version: ${version}
+name: DataComponentAPI
+load: POSTWORLD
+api-version: '1.20'
+author: toxicity
+description: Item data component api.
