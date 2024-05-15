@@ -113,6 +113,8 @@ listOf(
     }
 }
 
+rootProject.java17().fatJar()
+
 tasks {
     jar {
         finalizedBy(shadowJar)
