@@ -3,11 +3,19 @@ package kr.toxicity.test;
 import com.google.gson.JsonParser;
 import kr.toxicity.libraries.datacomponent.DataComponentAPIBukkit;
 import kr.toxicity.libraries.datacomponent.api.DataComponentAPI;
+import kr.toxicity.libraries.datacomponent.api.DataComponentType;
 import kr.toxicity.libraries.datacomponent.api.NMS;
+import kr.toxicity.libraries.datacomponent.api.wrapper.CompoundTag;
+import kr.toxicity.libraries.datacomponent.api.wrapper.CustomData;
 import kr.toxicity.libraries.datacomponent.api.wrapper.Rarity;
+import kr.toxicity.libraries.datacomponent.api.wrapper.Tag;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.HashMap;
+import java.util.List;
 
 public class TestPlugin extends JavaPlugin {
     @Override
@@ -31,5 +39,18 @@ public class TestPlugin extends JavaPlugin {
 
         var value = data.get(NMS.nms().rarity());
         if (value != null) getLogger().info(value.name());
+
+        for (Material material : Material.values()) {
+            if (material.isItem()) {
+                try {
+                    DataComponentAPI.api().adapter(new ItemStack(material)).serialize();
+                } catch (Exception e) {
+                    getLogger().info(material.name());
+                }
+            }
+        }
+        var test = DataComponentAPI.api().adapter(new ItemStack(Material.DIAMOND));
+        test.set(NMS.nms().customName(), Component.empty());
+        System.out.println(test.serialize());
     }
 }

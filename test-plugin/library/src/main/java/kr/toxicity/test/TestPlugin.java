@@ -27,5 +27,15 @@ public class TestPlugin extends JavaPlugin {
 
         var value = data.get(NMS.nms().rarity());
         if (value != null) getLogger().info(value.name());
+
+        for (Material material : Material.values()) {
+            if (material.isItem()) {
+                try {
+                    DataComponentAPI.api().adapter(new ItemStack(material)).serialize();
+                } catch (Exception e) {
+                    getLogger().info(material.name());
+                }
+            }
+        }
     }
 }
