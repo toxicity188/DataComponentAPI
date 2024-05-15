@@ -4,13 +4,9 @@ import com.google.gson.*;
 import kr.toxicity.libraries.datacomponent.api.*;
 import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Consumer;
+import java.util.*;
 
 @SuppressWarnings("unused")
 public final class DataComponentAPIImpl extends DataComponentAPI {
@@ -34,22 +30,27 @@ public final class DataComponentAPIImpl extends DataComponentAPI {
             throw new UnsupportedOperationException("Unsupported minecraft version: " + current);
         }
         deserializer = e -> {
-            List<Consumer<ItemAdapter>> consumer = Collections.synchronizedList(new ArrayList<>());
+            Map<DataComponentType<?>, JsonElement> consumer = Collections.synchronizedMap(new HashMap<>());
             for (Map.Entry<String, JsonElement> entry : e.entrySet()) {
                 var type = nms.componentRegistry().get(entry.getKey());
                 if (type != null) {
-                    consumer.add(a -> type.setToJson(a, entry.getValue()));
+                    consumer.put(type, entry.getValue());
                 }
             }
             return new DataComponent() {
                 @Override
                 public void set(@NotNull ItemAdapter adapter) {
-                    consumer.forEach(e -> e.accept(adapter));
+                    consumer.forEach(adapter::setToJson);
                 }
 
                 @Override
-                public @NotNull JsonObject get() {
+                public @NotNull JsonObject getToJson() {
                     return e;
+                }
+
+                @Override
+                public @Nullable JsonElement getToJson(@NotNull DataComponentType<?> type) {
+                    return consumer.get(type);
                 }
             };
         };
@@ -58,18 +59,6 @@ public final class DataComponentAPIImpl extends DataComponentAPI {
     @Override
     public @NotNull Deserializer deserializer() {
         return deserializer;
-    }
-
-    private record RegistryTypeAdapter<T>(DataComponentType<T> type) implements JsonSerializer<T>, JsonDeserializer<T> {
-        @Override
-        public JsonElement serialize(T src, Type typeOfSrc, JsonSerializationContext context) {
-            return type.codec().encode(src);
-        }
-
-        @Override
-        public T deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-            return type.codec().decode(json);
-        }
     }
 
     static void load() {

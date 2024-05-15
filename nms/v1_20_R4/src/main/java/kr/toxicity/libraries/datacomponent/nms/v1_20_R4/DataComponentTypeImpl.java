@@ -14,10 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Unmodifiable;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RequiredArgsConstructor
 final class DataComponentTypeImpl<T, R> implements kr.toxicity.libraries.datacomponent.api.DataComponentType<T> {
@@ -267,5 +264,18 @@ final class DataComponentTypeImpl<T, R> implements kr.toxicity.libraries.datacom
             R r = itemAdapter.itemStack.set(type, element != null ? codec.decode(element) : null);
             return r != null ? converter.asWrapper(r) : null;
         } else throw new IllegalArgumentException("adapter");
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        DataComponentTypeImpl<?, ?> that = (DataComponentTypeImpl<?, ?>) object;
+        return Objects.equals(key, that.key);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(key);
     }
 }
