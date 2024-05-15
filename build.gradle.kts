@@ -11,7 +11,7 @@ allprojects {
     apply(plugin = "java")
 
     group = "kr.toxicity.libraries.datacomponent"
-    version = "0.1"
+    version = "1.0.0"
 
     repositories {
         mavenCentral()
