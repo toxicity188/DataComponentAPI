@@ -24,10 +24,16 @@ public final class DataComponentAPIImpl extends DataComponentAPI {
     }
     private DataComponentAPIImpl(@NotNull MinecraftVersion current){
         this.current = current;
+        String version;
         if (current.equals(MinecraftVersionImpl.V1_20_5) || current.equals(MinecraftVersionImpl.V1_20_6)) {
-            nms = new kr.toxicity.libraries.datacomponent.nms.v1_20_R4.NMSImpl();
+            version = "v1_20_R4";
         } else {
             throw new UnsupportedOperationException("Unsupported minecraft version: " + current);
+        }
+        try {
+            nms = (NMS) Class.forName("kr.toxicity.libraries.datacomponent.nms." + version + ".NMSImpl").getConstructor().newInstance();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
         deserializer = e -> {
             Map<DataComponentType<?>, JsonElement> consumer = Collections.synchronizedMap(new HashMap<>());
