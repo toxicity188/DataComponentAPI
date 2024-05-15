@@ -111,7 +111,7 @@ listOf(
     }
 }
 
-rootProject.java17().fatJar()
+rootProject.java21().fatJar()
 
 tasks {
     jar {
