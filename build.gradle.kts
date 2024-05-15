@@ -150,7 +150,7 @@ afterEvaluate {
     publishing {
         publications {
             create<MavenPublication>("shadow") {
-                project.extensions.configure<com.github.jengelman.gradle.plugins.shadow.ShadowExtension>() {
+                project.extensions.configure<com.github.jengelman.gradle.plugins.shadow.ShadowExtension> {
                     component(this@create)
                 }
             }
