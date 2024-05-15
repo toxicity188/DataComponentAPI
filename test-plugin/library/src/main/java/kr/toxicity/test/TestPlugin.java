@@ -24,5 +24,7 @@ public class TestPlugin extends JavaPlugin {
         getLogger().info(diamond.serialize().toString());
         data.set(diamond);
         getLogger().info(diamond.serialize().toString());
+
+        getLogger().info(DataComponentAPI.api().adapter(new ItemStack(Material.NETHERITE_CHESTPLATE)).serialize().toString());
     }
 }
