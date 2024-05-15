@@ -31,3 +31,16 @@ public class TestPlugin extends JavaPlugin {
     }
 }
 ```
+
+### How to use
+``` kotlin
+repositories {
+    mavenCentral()
+    maven("https://jitpack.io")
+}
+
+dependencies {
+    implementation("com.github.toxicity188:DataComponentAPI:master-SNAPSHOT")
+}
+```
+
