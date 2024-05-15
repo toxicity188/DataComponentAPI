@@ -33,16 +33,11 @@ public interface ItemAdapter {
             }
         });
     }
-    default @NotNull JsonObject serialize() {
+    default @NotNull JsonObject serialize() throws IllegalStateException {
         var result = new JsonObject();
         DataComponentType.registry().values().forEach(r -> {
-            try {
-                var get = getToJson(r);
-                if (get != null) result.add(r.key(), get);
-            } catch (Exception e) {
-                System.out.println(r.key());
-                e.printStackTrace();
-            }
+            var get = getToJson(r);
+            if (get != null) result.add(r.key(), get);
         });
         return result;
     }
