@@ -146,11 +146,14 @@ tasks {
     }
 }
 
-publishing {
-    publications {
-        create<MavenPublication>("pluginMaven") {
-            artifact(tasks["shadowJar"])
-            project.shadow.component(this)
+afterEvaluate {
+    publishing {
+        publications {
+            create<MavenPublication>("shadow") {
+                project.extensions.configure<com.github.jengelman.gradle.plugins.shadow.ShadowExtension>() {
+                    component(this@create)
+                }
+            }
         }
     }
 }
