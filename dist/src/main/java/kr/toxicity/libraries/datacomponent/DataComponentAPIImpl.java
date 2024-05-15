@@ -16,7 +16,7 @@ import java.util.function.Consumer;
 public final class DataComponentAPIImpl extends DataComponentAPI {
     private final MinecraftVersion current;
     private final NMS nms;
-    private final Serializer serializer;
+    private final Deserializer deserializer;
 
     DataComponentAPIImpl() {
         this(new MinecraftVersionImpl(
@@ -33,7 +33,7 @@ public final class DataComponentAPIImpl extends DataComponentAPI {
         } else {
             throw new UnsupportedOperationException("Unsupported minecraft version: " + current);
         }
-        serializer = e -> {
+        deserializer = e -> {
             List<Consumer<ItemAdapter>> consumer = Collections.synchronizedList(new ArrayList<>());
             for (Map.Entry<String, JsonElement> entry : e.entrySet()) {
                 var type = nms.componentRegistry().get(entry.getKey());
@@ -56,8 +56,8 @@ public final class DataComponentAPIImpl extends DataComponentAPI {
     }
 
     @Override
-    public @NotNull Serializer serializer() {
-        return serializer;
+    public @NotNull Deserializer deserializer() {
+        return deserializer;
     }
 
     private record RegistryTypeAdapter<T>(DataComponentType<T> type) implements JsonSerializer<T>, JsonDeserializer<T> {

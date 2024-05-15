@@ -20,7 +20,7 @@ public class TestPlugin extends JavaPlugin {
         apply.set(NMS.nms().rarity(), Rarity.EPIC);
         getLogger().info(apply.serialize().toString());
 
-        var data = DataComponentAPI.api().serializer().serialize(
+        var data = DataComponentAPI.api().deserializer().deserialize(
                 JsonParser.parseString("{\"damage\":3,\"max_stack_size\":1,\"repair_cost\":20,\"tool\":{\"rules\":[{\"blocks\":\"minecraft:cobweb\",\"speed\":15.0,\"correct_for_drops\":true},{\"blocks\":\"#minecraft:sword_efficient\",\"speed\":1.5}],\"damage_per_block\":2},\"max_damage\":1561,\"item_lore\":[],\"rarity\":\"epic\"}").getAsJsonObject()
         );
         var diamond = DataComponentAPI.api().adapter(new ItemStack(Material.DIAMOND));

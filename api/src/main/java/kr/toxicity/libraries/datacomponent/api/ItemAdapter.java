@@ -26,7 +26,7 @@ public interface ItemAdapter {
     }
 
     default void deserialize(@NotNull JsonObject object) {
-        DataComponentAPI.api().serializer().serialize(object).set(this);
+        DataComponentAPI.api().deserializer().deserialize(object).set(this);
     }
     default @NotNull JsonObject serialize() throws IllegalStateException {
         var result = new JsonObject();
