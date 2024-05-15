@@ -9,6 +9,8 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
+
 public final class NMSImpl implements NMS {
 
     @Override
@@ -42,7 +44,12 @@ public final class NMSImpl implements NMS {
     }
 
     @Override
-    public @NotNull DataComponentType<ItemLore> itemLore() {
+    public @NotNull DataComponentType<Component> itemName() {
+        return DataComponentTypeImpl.ITEM_NAME;
+    }
+
+    @Override
+    public @NotNull DataComponentType<ItemLore> lore() {
         return DataComponentTypeImpl.ITEM_LORE;
     }
 
@@ -59,6 +66,11 @@ public final class NMSImpl implements NMS {
     @Override
     public @NotNull DataComponentType<AdventureModePredicate> canBreak() {
         return DataComponentTypeImpl.CAN_BREAK;
+    }
+
+    @Override
+    public @NotNull DataComponentType<CustomModelData> customModelData() {
+        return DataComponentTypeImpl.CUSTOM_MODEL_DATA;
     }
 
     @Override
@@ -144,5 +156,30 @@ public final class NMSImpl implements NMS {
     @Override
     public @NotNull DataComponentType<BlockItemStateProperties> blockState() {
         return DataComponentTypeImpl.BLOCK_STATE;
+    }
+
+    @Override
+    public @NotNull DataComponentType<CustomData> entityData() {
+        return DataComponentTypeImpl.ENTITY_DATA;
+    }
+
+    @Override
+    public @NotNull DataComponentType<CustomData> bucketEntityData() {
+        return DataComponentTypeImpl.BUCKET_ENTITY_DATA;
+    }
+
+    @Override
+    public @NotNull DataComponentType<CustomData> blockEntityData() {
+        return DataComponentTypeImpl.BLOCK_ENTITY_DATA;
+    }
+
+    @Override
+    public @NotNull DataComponentType<Integer> ominousBottleAmplifier() {
+        return DataComponentTypeImpl.OMINOUS_BOTTLE_AMPLIFIER;
+    }
+
+    @Override
+    public @NotNull DataComponentType<List<String>> recipes() {
+        return DataComponentTypeImpl.RECIPES;
     }
 }

@@ -1,9 +1,12 @@
 package kr.toxicity.libraries.datacomponent.api;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Function;
 
 @SuppressWarnings("unused")
@@ -12,8 +15,6 @@ public interface Codec<T> {
     JsonElement encode(@NotNull T t) throws IllegalStateException;
     @NotNull
     T decode(@NotNull JsonElement t) throws IllegalStateException;
-    @NotNull
-    Class<T> returnType();
 
     Codec<Integer> INTEGER = of(Integer.TYPE, JsonPrimitive::new, JsonElement::getAsInt);
     Codec<String> STRING = of(String.class, JsonPrimitive::new, JsonElement::getAsString);
@@ -31,13 +32,9 @@ public interface Codec<T> {
                 return decoder.apply(t);
             }
 
-            @Override
-            public @NotNull Class<T> returnType() {
-                return tClass;
-            }
         };
     }
-    default <R> @NotNull Codec<R> map(@NotNull Class<R> rClass, @NotNull Converter<R, T> converter) {
+    default <R> @NotNull Codec<R> map(@NotNull Converter<R, T> converter) {
         return new Codec<>() {
             @Override
             public @NotNull JsonElement encode(@NotNull R r) throws IllegalStateException {
@@ -48,10 +45,22 @@ public interface Codec<T> {
             public @NotNull R decode(@NotNull JsonElement t) throws IllegalStateException {
                 return converter.asWrapper(Codec.this.decode(t));
             }
+        };
+    }
+    default Codec<List<T>> list() {
+        return new Codec<>() {
+            @Override
+            public @NotNull JsonArray encode(@NotNull List<T> t) throws IllegalStateException {
+                var array = new JsonArray();
+                t.forEach(e -> array.add(Codec.this.encode(e)));
+                return array;
+            }
 
             @Override
-            public @NotNull Class<R> returnType() {
-                return rClass;
+            public @NotNull List<T> decode(@NotNull JsonElement t) throws IllegalStateException {
+                var list = new ArrayList<T>();
+                t.getAsJsonArray().forEach(e -> list.add(Codec.this.decode(e)));
+                return list;
             }
         };
     }

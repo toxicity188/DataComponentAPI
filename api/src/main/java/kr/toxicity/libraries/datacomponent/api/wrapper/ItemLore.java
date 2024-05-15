@@ -10,6 +10,6 @@ import java.util.List;
 public record ItemLore(@NotNull List<Component> lines, @NotNull List<Component> styledLines) implements ComponentData<ItemLore> {
     @Override
     public Codec<ItemLore> codec() {
-        return NMS.nms().itemLore().codec();
+        return NMS.nms().lore().codec();
     }
 }

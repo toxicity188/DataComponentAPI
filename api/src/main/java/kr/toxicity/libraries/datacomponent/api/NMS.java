@@ -5,6 +5,8 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
+
 @SuppressWarnings("unused")
 public interface NMS {
     static @NotNull NMS nms() {
@@ -24,13 +26,17 @@ public interface NMS {
     @NotNull
     DataComponentType<Component> customName();
     @NotNull
-    DataComponentType<ItemLore> itemLore();
+    DataComponentType<Component> itemName();
+    @NotNull
+    DataComponentType<ItemLore> lore();
     @NotNull
     DataComponentType<Rarity> rarity();
     @NotNull
     DataComponentType<AdventureModePredicate> canPlaceOn();
     @NotNull
     DataComponentType<AdventureModePredicate> canBreak();
+    @NotNull
+    DataComponentType<CustomModelData> customModelData();
     @NotNull
     DataComponentType<Integer> repairCost();
     @NotNull
@@ -65,4 +71,14 @@ public interface NMS {
     DataComponentType<ArmorTrim> trim();
     @NotNull
     DataComponentType<BlockItemStateProperties> blockState();
+    @NotNull
+    DataComponentType<CustomData> entityData();
+    @NotNull
+    DataComponentType<CustomData> bucketEntityData();
+    @NotNull
+    DataComponentType<CustomData> blockEntityData();
+    @NotNull
+    DataComponentType<Integer> ominousBottleAmplifier();
+    @NotNull
+    DataComponentType<List<String>> recipes();
 }

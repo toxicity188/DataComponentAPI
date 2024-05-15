@@ -2,6 +2,7 @@ package kr.toxicity.libraries.datacomponent.api;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
 import java.util.function.Function;
 
 public interface Converter<T, R> {
@@ -31,6 +32,19 @@ public interface Converter<T, R> {
             @Override
             public @NotNull R asWrapper(@NotNull T t) {
                 return Converter.this.asVanilla(t);
+            }
+        };
+    }
+    default Converter<List<T>, List<R>> list() {
+        return new Converter<>() {
+            @Override
+            public @NotNull List<R> asVanilla(@NotNull List<T> list) {
+                return list.stream().map(Converter.this::asVanilla).toList();
+            }
+
+            @Override
+            public @NotNull List<T> asWrapper(@NotNull List<R> rs) {
+                return rs.stream().map(Converter.this::asWrapper).toList();
             }
         };
     }

@@ -2,7 +2,6 @@ package kr.toxicity.test;
 
 import com.google.gson.JsonParser;
 import kr.toxicity.libraries.datacomponent.DataComponentAPIBukkit;
-import kr.toxicity.libraries.datacomponent.api.DataComponent;
 import kr.toxicity.libraries.datacomponent.api.DataComponentAPI;
 import kr.toxicity.libraries.datacomponent.api.NMS;
 import kr.toxicity.libraries.datacomponent.api.wrapper.Rarity;

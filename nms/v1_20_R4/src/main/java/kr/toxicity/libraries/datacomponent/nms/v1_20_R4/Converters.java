@@ -4,10 +4,13 @@ import io.papermc.paper.adventure.PaperAdventure;
 import kr.toxicity.libraries.datacomponent.api.Converter;
 import kr.toxicity.libraries.datacomponent.api.TrimPattern;
 import kr.toxicity.libraries.datacomponent.api.wrapper.*;
+import kr.toxicity.libraries.datacomponent.api.wrapper.CompoundTag;
+import kr.toxicity.libraries.datacomponent.api.wrapper.Tag;
 import net.kyori.adventure.text.Component;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.nbt.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.item.ArmorItem;
@@ -27,8 +30,141 @@ final class Converters {
             PaperAdventure::asVanilla,
             PaperAdventure::asAdventure
     );
+    private static final Converter<Tag<?>, net.minecraft.nbt.Tag> TAG = Converter.of(
+            t -> {
+                var object = t.value();
+                if (object instanceof Byte value) return ByteTag.valueOf(value);
+                if (object instanceof Short value) return ShortTag.valueOf(value);
+                if (object instanceof Integer value) return IntTag.valueOf(value);
+                if (object instanceof Long value) return LongTag.valueOf(value);
+                if (object instanceof UUID value) return NbtUtils.createUUID(value);
+                if (object instanceof Float value) return FloatTag.valueOf(value);
+                if (object instanceof Double value) return DoubleTag.valueOf(value);
+                if (object instanceof String value) return StringTag.valueOf(value);
+                if (object instanceof byte[] value) return new ByteArrayTag(value);
+                if (object instanceof int[] value) return new IntArrayTag(value);
+                if (object instanceof long[] value) return new LongArrayTag(value);
+                throw new UnsupportedOperationException("unsupported type.");
+            },
+            t -> {
+                var getter = new TagValueGetter();
+                t.accept(getter);
+                var object = getter.object;
+                if (object instanceof Byte value) return new Tag<>(Tag.BYTE, value);
+                if (object instanceof Short value) return new Tag<>(Tag.SHORT, value);
+                if (object instanceof Integer value) return new Tag<>(Tag.INT, value);
+                if (object instanceof Long value) return new Tag<>(Tag.LONG, value);
+                if (object instanceof UUID value) return new Tag<>(Tag.UUID, value);
+                if (object instanceof Float value) return new Tag<>(Tag.FLOAT, value);
+                if (object instanceof Double value) return new Tag<>(Tag.DOUBLE, value);
+                if (object instanceof String value) return new Tag<>(Tag.STRING, value);
+                if (object instanceof byte[] value) return new Tag<>(Tag.BYTE_ARRAY, value);
+                if (object instanceof int[] value) return new Tag<>(Tag.INT_ARRAY, value);
+                if (object instanceof long[] value) return new Tag<>(Tag.LONG_ARRAY, value);
+                throw new UnsupportedOperationException("unsupported type.");
+            }
+    );
 
-    private static final Converter<String, ResourceLocation> RESOURCE_LOCATION = Converter.of(
+    @SuppressWarnings("all")
+    private static class TagValueGetter implements StreamTagVisitor {
+        private Object object;
+        @Override
+        public ValueResult visitEnd() {
+            return ValueResult.BREAK;
+        }
+
+        @Override
+        public ValueResult visit(String value) {
+            object = value;
+            return ValueResult.BREAK;
+        }
+
+        @Override
+        public ValueResult visit(byte value) {
+            object = value;
+            return ValueResult.BREAK;
+        }
+
+        @Override
+        public ValueResult visit(short value) {
+            object = value;
+            return ValueResult.BREAK;
+        }
+
+        @Override
+        public ValueResult visit(int value) {
+            object = value;
+            return ValueResult.BREAK;
+        }
+
+        @Override
+        public ValueResult visit(long value) {
+            object = value;
+            return ValueResult.BREAK;
+        }
+
+        @Override
+        public ValueResult visit(float value) {
+            object = value;
+            return ValueResult.BREAK;
+        }
+
+        @Override
+        public ValueResult visit(double value) {
+            object = value;
+            return ValueResult.BREAK;
+        }
+
+        @Override
+        public ValueResult visit(byte[] value) {
+            object = value;
+            return ValueResult.BREAK;
+        }
+
+        @Override
+        public ValueResult visit(int[] value) {
+            object = value;
+            return ValueResult.BREAK;
+        }
+
+        @Override
+        public ValueResult visit(long[] value) {
+            object = value;
+            return ValueResult.BREAK;
+        }
+
+        @Override
+        public ValueResult visitList(TagType<?> entryType, int length) {
+            return ValueResult.BREAK;
+        }
+
+        @Override
+        public EntryResult visitEntry(TagType<?> type) {
+            return EntryResult.BREAK;
+        }
+
+        @Override
+        public EntryResult visitEntry(TagType<?> type, String key) {
+            return EntryResult.BREAK;
+        }
+
+        @Override
+        public EntryResult visitElement(TagType<?> type, int index) {
+            return EntryResult.BREAK;
+        }
+
+        @Override
+        public ValueResult visitContainerEnd() {
+            return ValueResult.BREAK;
+        }
+
+        @Override
+        public ValueResult visitRootEntry(TagType<?> rootType) {
+            return ValueResult.BREAK;
+        }
+    }
+
+    static final Converter<String, ResourceLocation> RESOURCE_LOCATION = Converter.of(
             s -> new ResourceLocation("minecraft", s),
             ResourceLocation::getPath
     );
@@ -207,6 +343,10 @@ final class Converters {
                 case EPIC -> Rarity.EPIC;
             }
     );
+    static final Converter<CustomModelData, net.minecraft.world.item.component.CustomModelData> CUSTOM_MODEL_DATA = Converter.of(
+            c -> new net.minecraft.world.item.component.CustomModelData(c.value()),
+            c -> new CustomModelData(c.value())
+    );
     static final Converter<AdventureModePredicate, net.minecraft.world.item.AdventureModePredicate> ADVENTURE_MODE_PREDICATE = Converter.of(
             a -> new net.minecraft.world.item.AdventureModePredicate(a.predicates().stream().map(BLOCK_PREDICATE::asVanilla).toList(), a.showInTooltip()),
             a -> new AdventureModePredicate(a.predicates.stream().map(BLOCK_PREDICATE::asWrapper).toList(), a.showInTooltip())
@@ -226,6 +366,21 @@ final class Converters {
                     t.defaultMiningSpeed(),
                     t.damagePerBlock()
             )
+    );
+    static final Converter<CompoundTag, net.minecraft.nbt.CompoundTag> COMPOUND_TAG = Converter.of(
+            t -> {
+                var tag = new net.minecraft.nbt.CompoundTag();
+                t.tags().forEach((k, v) -> tag.put(k, TAG.asVanilla(v)));
+                return tag;
+            },
+            t -> {
+                var map = new HashMap<String, Tag<?>>();
+                t.getAllKeys().forEach(k -> {
+                    var get = t.get(k);
+                    if (get != null) map.put(k, TAG.asWrapper(get));
+                });
+                return new CompoundTag(map);
+            }
     );
     static final Converter<DyedItemColor, net.minecraft.world.item.component.DyedItemColor> DYED_ITEM_COLOR = Converter.of(
             d -> new net.minecraft.world.item.component.DyedItemColor(d.rgb(), d.showInTooltip()),
@@ -323,5 +478,10 @@ final class Converters {
                     TRIM_PATTERN.asWrapper(t.pattern().value()),
                     t.showInTooltip
             )
+    );
+
+    static final Converter<CustomData, net.minecraft.world.item.component.CustomData> CUSTOM_DATA = Converter.of(
+            c -> net.minecraft.world.item.component.CustomData.of(COMPOUND_TAG.asVanilla(c.tag())),
+            c -> new CustomData(COMPOUND_TAG.asWrapper(c.copyTag()))
     );
 }
