@@ -31,7 +31,7 @@ public final class DataComponentAPIImpl extends DataComponentAPI {
             throw new UnsupportedOperationException("Unsupported minecraft version: " + current);
         }
         try {
-            nms = (NMS) Class.forName("kr.toxicity.libraries.datacomponent.nms." + version + ".NMSImpl").getConstructor().newInstance();
+            nms = (NMS) Class.forName(getClass().getPackage().getName() + ".nms." + version + ".NMSImpl").getConstructor().newInstance();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

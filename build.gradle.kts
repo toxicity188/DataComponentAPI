@@ -11,7 +11,7 @@ allprojects {
     apply(plugin = "java")
 
     group = "kr.toxicity.libraries.datacomponent"
-    version = "1.0.5"
+    version = "1.0.6"
 
     repositories {
         mavenCentral()
@@ -49,10 +49,23 @@ fun Project.dependency(dependency: Any) = also {
     }
 }
 
+fun Project.java17() = also {
+    it.java {
+        toolchain.languageVersion = JavaLanguageVersion.of(17)
+        toolchain.vendor = JvmVendorSpec.ADOPTIUM
+    }
+}
+fun Project.java21() = also {
+    it.java {
+        toolchain.languageVersion = JavaLanguageVersion.of(21)
+        toolchain.vendor = JvmVendorSpec.ADOPTIUM
+    }
+}
+
 fun Project.paper() = dependency("io.papermc.paper:paper-api:1.20.4-R0.1-SNAPSHOT")
 fun Project.paperweight() = also {
     it.apply(plugin = "io.papermc.paperweight.userdev")
-}
+}.java21()
 fun Project.shadowJar() = also {
     it.apply(plugin = "io.github.goooler.shadow")
 }
@@ -60,16 +73,16 @@ fun Project.runPaper() = also {
     it.apply(plugin = "xyz.jpenilla.run-paper")
 }
 
-val api = project("api").paper()
+val api = project("api").paper().java17()
 
-val dist = project("dist").paper().dependency(api)
+val dist = project("dist").paper().java17().dependency(api)
 
 val nms = listOf(
     project("nms:v1_20_R4").paperweight(),
-).onEach {
-    it.dependency(api).java {
-        toolchain.languageVersion = JavaLanguageVersion.of(21)
-    }
+)
+
+nms.forEach {
+    it.dependency(api)
     dist.dependency(it)
 }
 
@@ -88,10 +101,8 @@ listOf(
     project("test-plugin:library").runPaper(),
     project("test-plugin:shade").runPaper().shadowJar()
 ).forEach {
-    it.java {
-        toolchain.languageVersion = JavaLanguageVersion.of(21)
-    }
     it.paper()
+        .java21()
         .fatJar()
         .tasks {
             runServer {
@@ -100,11 +111,6 @@ listOf(
                 version("1.20.6")
             }
     }
-}
-
-
-rootProject.fatJar().java {
-    toolchain.languageVersion = JavaLanguageVersion.of(21)
 }
 
 tasks {
