@@ -1,0 +1,7 @@
+main: kr.toxicity.test.TestPlugin
+version: 1.0
+name: TestPlugin
+load: POSTWORLD
+api-version: '1.20'
+author: toxicity
+description: test.

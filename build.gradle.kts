@@ -1,0 +1,156 @@
+plugins {
+    id("java")
+    id("io.github.goooler.shadow") version("8.1.7")
+    id("io.papermc.paperweight.userdev") version("1.7.1") apply(false)
+    id("xyz.jpenilla.run-paper") version("2.3.0")
+    `maven-publish`
+}
+
+
+allprojects {
+    apply(plugin = "java")
+
+    group = "kr.toxicity.libraries.datacomponent"
+    version = "1.0"
+
+    repositories {
+        mavenCentral()
+        maven("https://repo.papermc.io/repository/maven-public/")
+    }
+
+    dependencies {
+        compileOnly("org.projectlombok:lombok:1.18.32")
+        annotationProcessor("org.projectlombok:lombok:1.18.32")
+
+        testCompileOnly("org.projectlombok:lombok:1.18.32")
+        testAnnotationProcessor("org.projectlombok:lombok:1.18.32")
+
+        testImplementation(platform("org.junit:junit-bom:5.10.0"))
+        testImplementation("org.junit.jupiter:junit-jupiter")
+    }
+
+    tasks {
+        compileJava {
+            options.encoding = Charsets.UTF_8.name()
+        }
+        test {
+            useJUnitPlatform()
+        }
+    }
+    java {
+        toolchain.languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+fun Project.dependency(dependency: Any) = also {
+    it.dependencies {
+        compileOnly(dependency)
+        testImplementation(dependency)
+    }
+}
+
+fun Project.paper() = dependency("io.papermc.paper:paper-api:1.20.6-R0.1-SNAPSHOT")
+fun Project.paperweight() = also {
+    it.apply(plugin = "io.papermc.paperweight.userdev")
+}
+fun Project.shadowJar() = also {
+    it.apply(plugin = "io.github.goooler.shadow")
+}
+fun Project.runPaper() = also {
+    it.apply(plugin = "xyz.jpenilla.run-paper")
+}
+
+listOf(
+    project("test-plugin:library")
+        .paper()
+        .runPaper()
+        .also {
+            it.dependencies {
+                compileOnly(project(":", configuration = "shadow"))
+            }
+            it.tasks{
+                runServer {
+                    layout.buildDirectory.dir("libs").map { d ->
+                        d.asFile
+                    }.orNull?.listFiles()?.firstOrNull { f ->
+                        f.nameWithoutExtension.endsWith(project.version.toString())
+                    }?.let { jar ->
+                        pluginJars(jar)
+                    }
+                }
+                jar {
+                    manifest {
+                        attributes["paperweight-mappings-namespace"] = "spigot"
+                    }
+                }
+            }
+        },
+    project("test-plugin:shade")
+        .paper()
+        .runPaper()
+        .shadowJar()
+        .also {
+            it.tasks {
+                jar {
+                    finalizedBy(shadowJar)
+                }
+                shadowJar {
+                    archiveClassifier = ""
+                    manifest {
+                        attributes["paperweight-mappings-namespace"] = "spigot"
+                    }
+                }
+            }
+            it.dependencies {
+                implementation(project(":", configuration = "shadow"))
+            }
+        }
+).forEach {
+    it.tasks {
+        runServer {
+            runDirectory(File(rootProject.projectDir, "run"))
+            dependsOn(rootProject.tasks.build)
+            version("1.20.6")
+        }
+    }
+}
+
+
+val api = project("api").paper()
+val dist = project("dist").paper().dependency(api)
+
+val nms = listOf(
+    project("nms:v1_20_R4").paperweight(),
+).onEach {
+    it.dependency(api)
+    dist.dependency(it)
+}
+
+dependencies {
+    implementation(api)
+    implementation(dist)
+    nms.forEach {
+        implementation(project(":nms:${it.name}", configuration = "reobf"))
+    }
+}
+
+tasks {
+    jar {
+        finalizedBy(shadowJar)
+    }
+    shadowJar {
+        manifest {
+            attributes["paperweight-mappings-namespace"] = "spigot"
+        }
+        archiveClassifier = ""
+    }
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("pluginMaven") {
+            artifact(tasks["shadowJar"])
+            project.shadow.component(this)
+        }
+    }
+}
