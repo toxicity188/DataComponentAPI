@@ -11,7 +11,7 @@ allprojects {
     apply(plugin = "java")
 
     group = "kr.toxicity.libraries.datacomponent"
-    version = "1.0"
+    version = "0.1"
 
     repositories {
         mavenCentral()
@@ -35,6 +35,9 @@ allprojects {
         }
         test {
             useJUnitPlatform()
+        }
+        compileJava {
+            dependsOn(clean)
         }
     }
     java {
@@ -60,63 +63,8 @@ fun Project.runPaper() = also {
     it.apply(plugin = "xyz.jpenilla.run-paper")
 }
 
-listOf(
-    project("test-plugin:library")
-        .paper()
-        .runPaper()
-        .also {
-            it.dependencies {
-                compileOnly(project(":", configuration = "shadow"))
-            }
-            it.tasks{
-                runServer {
-                    layout.buildDirectory.dir("libs").map { d ->
-                        d.asFile
-                    }.orNull?.listFiles()?.firstOrNull { f ->
-                        f.nameWithoutExtension.endsWith(project.version.toString())
-                    }?.let { jar ->
-                        pluginJars(jar)
-                    }
-                }
-                jar {
-                    manifest {
-                        attributes["paperweight-mappings-namespace"] = "spigot"
-                    }
-                }
-            }
-        },
-    project("test-plugin:shade")
-        .paper()
-        .runPaper()
-        .shadowJar()
-        .also {
-            it.tasks {
-                jar {
-                    finalizedBy(shadowJar)
-                }
-                shadowJar {
-                    archiveClassifier = ""
-                    manifest {
-                        attributes["paperweight-mappings-namespace"] = "spigot"
-                    }
-                }
-            }
-            it.dependencies {
-                implementation(project(":", configuration = "shadow"))
-            }
-        }
-).forEach {
-    it.tasks {
-        runServer {
-            runDirectory(File(rootProject.projectDir, "run"))
-            dependsOn(rootProject.tasks.build)
-            version("1.20.6")
-        }
-    }
-}
-
-
 val api = project("api").paper()
+
 val dist = project("dist").paper().dependency(api)
 
 val nms = listOf(
@@ -126,13 +74,63 @@ val nms = listOf(
     dist.dependency(it)
 }
 
-dependencies {
-    implementation(api)
-    implementation(dist)
-    nms.forEach {
-        implementation(project(":nms:${it.name}", configuration = "reobf"))
+
+fun Project.fatJar() = also {
+    it.dependencies {
+        implementation(api)
+        implementation(dist)
+        nms.forEach {
+            implementation(project(":nms:${it.name}", configuration = "reobf"))
+        }
     }
 }
+
+listOf(
+    project("test-plugin:library").runPaper().also {
+        it.tasks {
+            runServer {
+                layout.buildDirectory.dir("libs").map { d ->
+                    d.asFile
+                }.orNull?.listFiles()?.firstOrNull { f ->
+                    f.nameWithoutExtension.endsWith(project.version.toString())
+                }?.let { jar ->
+                    pluginJars(jar)
+                }
+            }
+            jar {
+                manifest {
+                    attributes["paperweight-mappings-namespace"] = "spigot"
+                }
+            }
+        }
+    },
+    project("test-plugin:shade").runPaper().shadowJar().also {
+        it.tasks {
+            jar {
+                finalizedBy(shadowJar)
+            }
+            shadowJar {
+                archiveClassifier = ""
+                manifest {
+                    attributes["paperweight-mappings-namespace"] = "spigot"
+                }
+            }
+        }
+    }
+).forEach {
+    it.paper()
+        .fatJar()
+        .tasks {
+            runServer {
+                runDirectory(File(rootProject.projectDir, "run"))
+                dependsOn(rootProject.tasks.build)
+                version("1.20.6")
+            }
+    }
+}
+
+
+rootProject.fatJar()
 
 tasks {
     jar {
