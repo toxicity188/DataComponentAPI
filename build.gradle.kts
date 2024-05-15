@@ -31,14 +31,17 @@ allprojects {
 
     tasks {
         compileJava {
+            dependsOn(clean)
+            options.compilerArgs.addAll(listOf("-source", "17", "-target", "17"))
             options.encoding = Charsets.UTF_8.name()
         }
         test {
             useJUnitPlatform()
         }
-        compileJava {
-            dependsOn(clean)
-        }
+    }
+
+    java {
+        toolchain.languageVersion = JavaLanguageVersion.of(21)
     }
 }
 
@@ -49,21 +52,10 @@ fun Project.dependency(dependency: Any) = also {
     }
 }
 
-fun Project.java17() = also {
-    it.java {
-        toolchain.languageVersion = JavaLanguageVersion.of(17)
-    }
-}
-fun Project.java21() = also {
-    it.java {
-        toolchain.languageVersion = JavaLanguageVersion.of(21)
-    }
-}
-
-fun Project.paper() = dependency("io.papermc.paper:paper-api:1.20.4-R0.1-SNAPSHOT")
+fun Project.paper() = dependency("io.papermc.paper:paper-api:1.20.6-R0.1-SNAPSHOT")
 fun Project.paperweight() = also {
     it.apply(plugin = "io.papermc.paperweight.userdev")
-}.java21()
+}
 fun Project.shadowJar() = also {
     it.apply(plugin = "io.github.goooler.shadow")
 }
@@ -71,9 +63,9 @@ fun Project.runPaper() = also {
     it.apply(plugin = "xyz.jpenilla.run-paper")
 }
 
-val api = project("api").paper().java17()
+val api = project("api").paper()
 
-val dist = project("dist").paper().java17().dependency(api)
+val dist = project("dist").paper().dependency(api)
 
 val nms = listOf(
     project("nms:v1_20_R4").paperweight(),
@@ -100,7 +92,6 @@ listOf(
     project("test-plugin:shade").runPaper().shadowJar()
 ).forEach {
     it.paper()
-        .java21()
         .fatJar()
         .tasks {
             runServer {
@@ -111,7 +102,7 @@ listOf(
     }
 }
 
-rootProject.java21().fatJar()
+rootProject.fatJar()
 
 tasks {
     jar {
