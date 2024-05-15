@@ -52,13 +52,11 @@ fun Project.dependency(dependency: Any) = also {
 fun Project.java17() = also {
     it.java {
         toolchain.languageVersion = JavaLanguageVersion.of(17)
-        toolchain.vendor = JvmVendorSpec.ADOPTIUM
     }
 }
 fun Project.java21() = also {
     it.java {
         toolchain.languageVersion = JavaLanguageVersion.of(21)
-        toolchain.vendor = JvmVendorSpec.ADOPTIUM
     }
 }
 
