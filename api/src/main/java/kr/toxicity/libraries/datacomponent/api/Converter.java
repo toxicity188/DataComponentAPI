@@ -21,4 +21,17 @@ public interface Converter<T, R> {
             }
         };
     }
+    default Converter<R, T> reversed() {
+        return new Converter<>() {
+            @Override
+            public @NotNull T asVanilla(@NotNull R r) {
+                return Converter.this.asWrapper(r);
+            }
+
+            @Override
+            public @NotNull R asWrapper(@NotNull T t) {
+                return Converter.this.asVanilla(t);
+            }
+        };
+    }
 }

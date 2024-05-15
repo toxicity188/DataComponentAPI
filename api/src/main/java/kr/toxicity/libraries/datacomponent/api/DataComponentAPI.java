@@ -19,6 +19,7 @@ public abstract class DataComponentAPI {
 
     public abstract @NotNull MinecraftVersion current();
     public abstract @NotNull NMS nms();
+    public abstract @NotNull Serializer serializer();
 
     public @NotNull ItemAdapter adapter(@NotNull ItemStack itemStack) {
         return nms().adapter(itemStack);

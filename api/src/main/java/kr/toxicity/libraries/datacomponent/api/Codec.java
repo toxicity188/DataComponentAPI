@@ -12,13 +12,15 @@ public interface Codec<T> {
     JsonElement encode(@NotNull T t) throws IllegalStateException;
     @NotNull
     T decode(@NotNull JsonElement t) throws IllegalStateException;
+    @NotNull
+    Class<T> returnType();
 
-    Codec<Integer> INTEGER = of(JsonPrimitive::new, JsonElement::getAsInt);
-    Codec<String> STRING = of(JsonPrimitive::new, JsonElement::getAsString);
-    Codec<Boolean> BOOL = of(JsonPrimitive::new, JsonElement::getAsBoolean);
+    Codec<Integer> INTEGER = of(Integer.TYPE, JsonPrimitive::new, JsonElement::getAsInt);
+    Codec<String> STRING = of(String.class, JsonPrimitive::new, JsonElement::getAsString);
+    Codec<Boolean> BOOL = of(Boolean.TYPE, JsonPrimitive::new, JsonElement::getAsBoolean);
 
-    static <T> @NotNull Codec<T> of(@NotNull Function<T, JsonElement> encoder, @NotNull Function<JsonElement, T> decoder) {
-        return new Codec<T>() {
+    static <T> @NotNull Codec<T> of(@NotNull Class<T> tClass, @NotNull Function<T, JsonElement> encoder, @NotNull Function<JsonElement, T> decoder) {
+        return new Codec<>() {
             @Override
             public @NotNull JsonElement encode(@NotNull T t) throws IllegalStateException {
                 return encoder.apply(t);
@@ -27,6 +29,29 @@ public interface Codec<T> {
             @Override
             public @NotNull T decode(@NotNull JsonElement t) throws IllegalStateException {
                 return decoder.apply(t);
+            }
+
+            @Override
+            public @NotNull Class<T> returnType() {
+                return tClass;
+            }
+        };
+    }
+    default <R> @NotNull Codec<R> map(@NotNull Class<R> rClass, @NotNull Converter<R, T> converter) {
+        return new Codec<>() {
+            @Override
+            public @NotNull JsonElement encode(@NotNull R r) throws IllegalStateException {
+                return Codec.this.encode(converter.asVanilla(r));
+            }
+
+            @Override
+            public @NotNull R decode(@NotNull JsonElement t) throws IllegalStateException {
+                return converter.asWrapper(Codec.this.decode(t));
+            }
+
+            @Override
+            public @NotNull Class<R> returnType() {
+                return rClass;
             }
         };
     }

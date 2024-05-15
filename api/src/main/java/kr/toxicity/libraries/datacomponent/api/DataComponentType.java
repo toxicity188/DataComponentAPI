@@ -9,6 +9,7 @@ public interface DataComponentType<T> {
         return NMS.nms().componentRegistry();
     }
     @NotNull String key();
+    @NotNull Codec<T> codec();
 
     @Nullable T set(@NotNull ItemAdapter adapter, @Nullable T t);
     @Nullable T get(@NotNull ItemAdapter adapter);

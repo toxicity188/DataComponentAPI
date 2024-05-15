@@ -26,12 +26,7 @@ public interface ItemAdapter {
     }
 
     default void deserialize(@NotNull JsonObject object) {
-        object.entrySet().forEach(e -> {
-            var type = DataComponentType.registry().get(e.getKey());
-            if (type != null) {
-                setToJson(type, e.getValue());
-            }
-        });
+        DataComponentAPI.api().serializer().serialize(object).set(this);
     }
     default @NotNull JsonObject serialize() throws IllegalStateException {
         var result = new JsonObject();
