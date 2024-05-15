@@ -13,9 +13,11 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.util.Unit;
+import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.AdventureModePredicate;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.alchemy.PotionContents;
+import net.minecraft.world.item.armortrim.ArmorTrim;
 import net.minecraft.world.item.component.*;
 import net.minecraft.world.level.saveddata.maps.MapId;
 import org.jetbrains.annotations.NotNull;
@@ -42,6 +44,8 @@ final class CodecImpl<T> implements kr.toxicity.libraries.datacomponent.api.Code
     static final CodecImpl<WritableBookContent> WRITABLE_BOOK_CONTENT = of(WritableBookContent.class, WritableBookContent.CODEC, t -> new JsonObject());
     static final CodecImpl<WrittenBookContent> WRITTEN_BOOK_CONTENT = of(WrittenBookContent.class, WrittenBookContent.CODEC, t -> new JsonObject());
     static final CodecImpl<BlockItemStateProperties> BLOCK_STATE = of(BlockItemStateProperties.class, BlockItemStateProperties.CODEC, t -> new JsonObject());
+    static final CodecImpl<FoodProperties> FOOD = of(FoodProperties.class, FoodProperties.DIRECT_CODEC, t -> new JsonObject());
+    static final CodecImpl<ArmorTrim> TRIM = of(ArmorTrim.class, ArmorTrim.CODEC, t -> new JsonObject());
 
     private static <T> @NotNull CodecImpl<T> of(@NotNull Class<T> clazz, @NotNull Codec<T> codec, Function<T, JsonElement> function) {
         return new CodecImpl<>(

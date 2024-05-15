@@ -124,6 +124,13 @@ final class DataComponentTypeImpl<T, R> implements kr.toxicity.libraries.datacom
             Converters.UNIT,
             CodecImpl.UNIT
     );
+    static final DataComponentTypeImpl<FoodProperties, net.minecraft.world.food.FoodProperties> FOOD = register(
+            "food",
+            FoodProperties.class,
+            DataComponents.FOOD,
+            Converters.FOOD,
+            CodecImpl.FOOD
+    );
     static final DataComponentTypeImpl<Unit, net.minecraft.util.Unit> FIRE_RESISTANT = register(
             "fire_resistance",
             Unit.class,
@@ -200,6 +207,13 @@ final class DataComponentTypeImpl<T, R> implements kr.toxicity.libraries.datacom
             DataComponents.BLOCK_STATE,
             Converters.BLOCK_STATE,
             CodecImpl.BLOCK_STATE
+    );
+    static final DataComponentTypeImpl<ArmorTrim, net.minecraft.world.item.armortrim.ArmorTrim> TRIM = register(
+            "trim",
+            ArmorTrim.class,
+            DataComponents.TRIM,
+            Converters.TRIM,
+            CodecImpl.TRIM
     );
 
     private final String key;

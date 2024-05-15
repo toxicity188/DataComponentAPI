@@ -40,6 +40,8 @@ public interface NMS {
     @NotNull
     DataComponentType<Unit> intangibleProjectile();
     @NotNull
+    DataComponentType<FoodProperties> food();
+    @NotNull
     DataComponentType<Unit> fireResistant();
     @NotNull
     DataComponentType<Tool> tool();
@@ -59,6 +61,8 @@ public interface NMS {
     DataComponentType<WritableBookContent> writableBookContent();
     @NotNull
     DataComponentType<WrittenBookContent> writtenBookContent();
+    @NotNull
+    DataComponentType<ArmorTrim> trim();
     @NotNull
     DataComponentType<BlockItemStateProperties> blockState();
 }

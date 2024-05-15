@@ -82,6 +82,11 @@ public final class NMSImpl implements NMS {
     }
 
     @Override
+    public @NotNull DataComponentType<FoodProperties> food() {
+        return DataComponentTypeImpl.FOOD;
+    }
+
+    @Override
     public @NotNull DataComponentType<Unit> fireResistant() {
         return DataComponentTypeImpl.FIRE_RESISTANT;
     }
@@ -129,6 +134,11 @@ public final class NMSImpl implements NMS {
     @Override
     public @NotNull DataComponentType<WrittenBookContent> writtenBookContent() {
         return DataComponentTypeImpl.WRITTEN_BOOK_CONTENT;
+    }
+
+    @Override
+    public @NotNull DataComponentType<ArmorTrim> trim() {
+        return DataComponentTypeImpl.TRIM;
     }
 
     @Override
