@@ -16,11 +16,11 @@ public interface Codec<T> {
     @NotNull
     T decode(@NotNull JsonElement t) throws IllegalStateException;
 
-    Codec<Integer> INTEGER = of(Integer.TYPE, JsonPrimitive::new, JsonElement::getAsInt);
-    Codec<String> STRING = of(String.class, JsonPrimitive::new, JsonElement::getAsString);
-    Codec<Boolean> BOOL = of(Boolean.TYPE, JsonPrimitive::new, JsonElement::getAsBoolean);
+    Codec<Integer> INTEGER = of(JsonPrimitive::new, JsonElement::getAsInt);
+    Codec<String> STRING = of(JsonPrimitive::new, JsonElement::getAsString);
+    Codec<Boolean> BOOL = of(JsonPrimitive::new, JsonElement::getAsBoolean);
 
-    static <T> @NotNull Codec<T> of(@NotNull Class<T> tClass, @NotNull Function<T, JsonElement> encoder, @NotNull Function<JsonElement, T> decoder) {
+    static <T> @NotNull Codec<T> of(@NotNull Function<T, JsonElement> encoder, @NotNull Function<JsonElement, T> decoder) {
         return new Codec<>() {
             @Override
             public @NotNull JsonElement encode(@NotNull T t) throws IllegalStateException {

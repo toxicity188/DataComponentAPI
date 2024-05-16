@@ -6,6 +6,8 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.function.Supplier;
+
 @SuppressWarnings("unused")
 public interface ItemAdapter {
     @NotNull
@@ -17,12 +19,24 @@ public interface ItemAdapter {
     default <T> T get(@NotNull DataComponentType<T> type) {
         return type.get(this);
     }
+    default <T> void set(@NotNull Supplier<DataComponentType<T>> type, @Nullable T t) {
+        set(type.get(), t);
+    }
+    default <T> T get(@NotNull Supplier<DataComponentType<T>> type) {
+        return get(type.get());
+    }
 
     default void setToJson(@NotNull DataComponentType<?> type, @Nullable JsonElement element) {
         type.setToJson(this, element);
     }
     default JsonElement getToJson(@NotNull DataComponentType<?> type) {
         return type.getToJson(this);
+    }
+    default void setToJson(@NotNull Supplier<DataComponentType<?>> type, @Nullable JsonElement element) {
+        setToJson(type.get(), element);
+    }
+    default JsonElement getToJson(@NotNull Supplier<DataComponentType<?>> type) {
+        return getToJson(type.get());
     }
 
     default void deserialize(@NotNull JsonObject object) {

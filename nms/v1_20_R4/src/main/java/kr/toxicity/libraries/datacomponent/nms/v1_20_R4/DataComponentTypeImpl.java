@@ -208,13 +208,13 @@ final class DataComponentTypeImpl<T, R> implements kr.toxicity.libraries.datacom
     );
     static final DataComponentTypeImpl<CustomData, net.minecraft.world.item.component.CustomData> BUCKET_ENTITY_DATA = register(
             "bucket_entity_data",
-            DataComponents.ENTITY_DATA,
+            DataComponents.BUCKET_ENTITY_DATA,
             Converters.CUSTOM_DATA,
             CodecImpl.CUSTOM_DATA
     );
     static final DataComponentTypeImpl<CustomData, net.minecraft.world.item.component.CustomData> BLOCK_ENTITY_DATA = register(
             "block_entity_data",
-            DataComponents.ENTITY_DATA,
+            DataComponents.BLOCK_ENTITY_DATA,
             Converters.CUSTOM_DATA,
             CodecImpl.CUSTOM_DATA
     );

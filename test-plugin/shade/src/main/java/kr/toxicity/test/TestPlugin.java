@@ -5,17 +5,11 @@ import kr.toxicity.libraries.datacomponent.DataComponentAPIBukkit;
 import kr.toxicity.libraries.datacomponent.api.DataComponentAPI;
 import kr.toxicity.libraries.datacomponent.api.DataComponentType;
 import kr.toxicity.libraries.datacomponent.api.NMS;
-import kr.toxicity.libraries.datacomponent.api.wrapper.CompoundTag;
-import kr.toxicity.libraries.datacomponent.api.wrapper.CustomData;
 import kr.toxicity.libraries.datacomponent.api.wrapper.Rarity;
-import kr.toxicity.libraries.datacomponent.api.wrapper.Tag;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import java.util.HashMap;
-import java.util.List;
 
 public class TestPlugin extends JavaPlugin {
     @Override
@@ -23,9 +17,9 @@ public class TestPlugin extends JavaPlugin {
         DataComponentAPIBukkit.load();
 
         var apply = DataComponentAPI.api().adapter(new ItemStack(Material.DIAMOND_SWORD));
-        apply.set(NMS.nms().damage(), 3);
-        apply.set(NMS.nms().repairCost(), 20);
-        apply.set(NMS.nms().rarity(), Rarity.EPIC);
+        apply.set(DataComponentType.DAMAGE, 3);
+        apply.set(DataComponentType.REPAIR_COST, 20);
+        apply.set(DataComponentType.RARITY, Rarity.EPIC);
         getLogger().info(apply.serialize().toString());
 
         // Serialization.
