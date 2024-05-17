@@ -14,6 +14,7 @@ import static kr.toxicity.libraries.datacomponent.api.NMS.nms;
 @SuppressWarnings("unused")
 public interface DataComponentType<T> {
 
+    Supplier<DataComponentType<CustomData>> CUSTOM_DATA = () -> nms().customData();
     Supplier<DataComponentType<Integer>> MAX_STACK_SIZE = () -> nms().maxStackSize();
     Supplier<DataComponentType<Integer>> MAX_DAMAGE = () -> nms().maxDamage();
     Supplier<DataComponentType<Integer>> DAMAGE = () -> nms().damage();

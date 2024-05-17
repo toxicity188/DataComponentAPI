@@ -38,6 +38,12 @@ final class DataComponentTypeImpl<T, R> implements kr.toxicity.libraries.datacom
         }
     };
 
+    static final DataComponentTypeImpl<CustomData, net.minecraft.world.item.component.CustomData> CUSTOM_DATA = register(
+            "custom_data",
+            DataComponents.CUSTOM_DATA,
+            Converters.CUSTOM_DATA,
+            CodecImpl.CUSTOM_DATA
+    );
     static final DataComponentTypeImpl<Integer, Integer> MAX_STACK_SIZE = register(
             "max_stack_size",
             DataComponents.MAX_STACK_SIZE,

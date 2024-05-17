@@ -7,6 +7,6 @@ import org.jetbrains.annotations.NotNull;
 public record CustomData(@NotNull CompoundTag tag) implements ComponentData<CustomData> {
     @Override
     public Codec<CustomData> codec() {
-        return NMS.nms().entityData().codec();
+        return NMS.nms().customData().codec();
     }
 }

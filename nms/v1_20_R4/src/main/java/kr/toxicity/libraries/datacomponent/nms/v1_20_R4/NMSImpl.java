@@ -19,6 +19,11 @@ public final class NMSImpl implements NMS {
     }
 
     @Override
+    public @NotNull DataComponentType<CustomData> customData() {
+        return DataComponentTypeImpl.CUSTOM_DATA;
+    }
+
+    @Override
     public @NotNull Registry<? extends DataComponentType<?>> componentRegistry() {
         return DataComponentTypeImpl.REGISTRY;
     }

@@ -1,50 +1,66 @@
 package kr.toxicity.test;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.stream.JsonWriter;
 import kr.toxicity.libraries.datacomponent.DataComponentAPIBukkit;
 import kr.toxicity.libraries.datacomponent.api.DataComponentAPI;
 import kr.toxicity.libraries.datacomponent.api.DataComponentType;
 import kr.toxicity.libraries.datacomponent.api.NMS;
-import kr.toxicity.libraries.datacomponent.api.wrapper.Rarity;
+import kr.toxicity.libraries.datacomponent.api.wrapper.*;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.util.HashMap;
 
 public class TestPlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         DataComponentAPIBukkit.load();
 
-        var apply = DataComponentAPI.api().adapter(new ItemStack(Material.DIAMOND_SWORD));
+        var apply = DataComponentAPI.api().adapter(new ItemStack(Material.NETHERITE_SWORD));
         apply.set(DataComponentType.DAMAGE, 3);
-        apply.set(DataComponentType.REPAIR_COST, 20);
-        apply.set(DataComponentType.RARITY, Rarity.EPIC);
-        getLogger().info(apply.serialize().toString());
+        apply.set(DataComponentType.REPAIR_COST, 10);
+        apply.set(DataComponentType.ENCHANTMENT_GLINT_OVERRIDE, false);
+        apply.set(DataComponentType.ITEM_NAME, Component.text("Hello"));
+        apply.set(DataComponentType.CUSTOM_NAME, Component.text("World"));
+        apply.set(DataComponentType.CUSTOM_MODEL_DATA, new CustomModelData(1));
 
-        // Serialization.
-        var data = DataComponentAPI.api().deserializer().deserialize(
-                JsonParser.parseString("{\"damage\":3,\"max_stack_size\":1,\"repair_cost\":20,\"tool\":{\"rules\":[{\"blocks\":\"minecraft:cobweb\",\"speed\":15.0,\"correct_for_drops\":true},{\"blocks\":\"#minecraft:sword_efficient\",\"speed\":1.5}],\"damage_per_block\":2},\"max_damage\":1561,\"item_lore\":[],\"rarity\":\"epic\"}").getAsJsonObject()
-        );
-        var diamond = DataComponentAPI.api().adapter(new ItemStack(Material.DIAMOND));
-        getLogger().info(diamond.serialize().toString());
-        data.set(diamond);
-        getLogger().info(diamond.serialize().toString());
+        var map = new HashMap<String, Tag<?>>();
+        map.put("a", new Tag<>(Tag.INT, 1));
+        map.put("b", new Tag<>(Tag.STRING, "ddd"));
+        map.put("c", new Tag<>(Tag.INT_ARRAY, new int[] {1, 2, 3}));
+        apply.set(DataComponentType.CUSTOM_DATA, new CustomData(new CompoundTag(map)));
 
-        var value = data.get(NMS.nms().rarity());
-        if (value != null) getLogger().info(value.name());
+        var get = apply.build();
 
-        for (Material material : Material.values()) {
-            if (material.isItem()) {
-                try {
-                    DataComponentAPI.api().adapter(new ItemStack(material)).serialize();
-                } catch (Exception e) {
-                    getLogger().info(material.name());
-                }
-            }
+        var data = getDataFolder();
+        if (!data.exists()) data.mkdirs();
+
+        var result = new File(data, "result.json");
+        var compare = new File(data, "compare.yml");
+        try (JsonWriter writer = new JsonWriter(new BufferedWriter(new FileWriter(result)))) {
+            writer.setIndent(" ");
+            var itemJson = new JsonObject();
+            itemJson.addProperty("type", Material.NETHERITE_SWORD.name());
+            itemJson.add("components", apply.serialize());
+            new Gson().toJson(itemJson, writer);
+        } catch (Exception e) {
+
         }
-        var test = DataComponentAPI.api().adapter(new ItemStack(Material.DIAMOND));
-        test.set(NMS.nms().customName(), Component.empty());
-        System.out.println(test.serialize());
+        try {
+            var yaml = new YamlConfiguration();
+            yaml.set("item" , get);
+            yaml.save(compare);
+        } catch (Exception e) {
+
+        }
     }
 }

@@ -18,6 +18,8 @@ public interface NMS {
     Registry<? extends DataComponentType<?>> componentRegistry();
 
     @NotNull
+    DataComponentType<CustomData> customData();
+    @NotNull
     DataComponentType<Integer> maxStackSize();
     @NotNull
     DataComponentType<Integer> maxDamage();
