@@ -30,137 +30,166 @@ final class Converters {
             PaperAdventure::asVanilla,
             PaperAdventure::asAdventure
     );
-    private static final Converter<Tag<?>, net.minecraft.nbt.Tag> TAG = Converter.of(
-            t -> {
-                var object = t.value();
-                if (object instanceof Byte value) return ByteTag.valueOf(value);
-                if (object instanceof Short value) return ShortTag.valueOf(value);
-                if (object instanceof Integer value) return IntTag.valueOf(value);
-                if (object instanceof Long value) return LongTag.valueOf(value);
-                if (object instanceof UUID value) return NbtUtils.createUUID(value);
-                if (object instanceof Float value) return FloatTag.valueOf(value);
-                if (object instanceof Double value) return DoubleTag.valueOf(value);
-                if (object instanceof String value) return StringTag.valueOf(value);
-                if (object instanceof byte[] value) return new ByteArrayTag(value);
-                if (object instanceof int[] value) return new IntArrayTag(value);
-                if (object instanceof long[] value) return new LongArrayTag(value);
-                throw new UnsupportedOperationException("unsupported type.");
-            },
-            t -> {
-                var getter = new TagValueGetter();
-                t.accept(getter);
-                var object = getter.object;
-                if (object instanceof Byte value) return new Tag<>(Tag.BYTE, value);
-                if (object instanceof Short value) return new Tag<>(Tag.SHORT, value);
-                if (object instanceof Integer value) return new Tag<>(Tag.INT, value);
-                if (object instanceof Long value) return new Tag<>(Tag.LONG, value);
-                if (object instanceof UUID value) return new Tag<>(Tag.UUID, value);
-                if (object instanceof Float value) return new Tag<>(Tag.FLOAT, value);
-                if (object instanceof Double value) return new Tag<>(Tag.DOUBLE, value);
-                if (object instanceof String value) return new Tag<>(Tag.STRING, value);
-                if (object instanceof byte[] value) return new Tag<>(Tag.BYTE_ARRAY, value);
-                if (object instanceof int[] value) return new Tag<>(Tag.INT_ARRAY, value);
-                if (object instanceof long[] value) return new Tag<>(Tag.LONG_ARRAY, value);
-                throw new UnsupportedOperationException("unsupported type.");
-            }
-    );
 
     @SuppressWarnings("all")
-    private static class TagValueGetter implements StreamTagVisitor {
+    private static class TagValueGetter implements TagVisitor {
+
         private Object object;
+
         @Override
-        public ValueResult visitEnd() {
-            return ValueResult.BREAK;
+        public void visitString(StringTag element) {
+            object = element.getAsString();
         }
 
         @Override
-        public ValueResult visit(String value) {
-            object = value;
-            return ValueResult.BREAK;
+        public void visitByte(ByteTag element) {
+            object = element.getAsByte();
+
         }
 
         @Override
-        public ValueResult visit(byte value) {
-            object = value;
-            return ValueResult.BREAK;
+        public void visitShort(ShortTag element) {
+            object = element.getAsShort();
+
         }
 
         @Override
-        public ValueResult visit(short value) {
-            object = value;
-            return ValueResult.BREAK;
+        public void visitInt(IntTag element) {
+            object = element.getAsInt();
+
         }
 
         @Override
-        public ValueResult visit(int value) {
-            object = value;
-            return ValueResult.BREAK;
+        public void visitLong(LongTag element) {
+            object = element.getAsLong();
+
         }
 
         @Override
-        public ValueResult visit(long value) {
-            object = value;
-            return ValueResult.BREAK;
+        public void visitFloat(FloatTag element) {
+            object = element.getAsFloat();
+
         }
 
         @Override
-        public ValueResult visit(float value) {
-            object = value;
-            return ValueResult.BREAK;
+        public void visitDouble(DoubleTag element) {
+            object = element.getAsDouble();
         }
 
         @Override
-        public ValueResult visit(double value) {
-            object = value;
-            return ValueResult.BREAK;
+        public void visitByteArray(ByteArrayTag element) {
+            object = element.getAsByteArray();
         }
 
         @Override
-        public ValueResult visit(byte[] value) {
-            object = value;
-            return ValueResult.BREAK;
+        public void visitIntArray(IntArrayTag element) {
+            object = element.getAsIntArray();
         }
 
         @Override
-        public ValueResult visit(int[] value) {
-            object = value;
-            return ValueResult.BREAK;
+        public void visitLongArray(LongArrayTag element) {
+            object = element.getAsLongArray();
         }
 
         @Override
-        public ValueResult visit(long[] value) {
-            object = value;
-            return ValueResult.BREAK;
+        public void visitList(ListTag element) {
+            var list = new ArrayList<>();
+            element.stream().forEach(t -> {
+                var visitor = new TagValueGetter();
+                t.accept(visitor);
+                list.add(visitor.object);
+            });
+            object = list;
         }
 
         @Override
-        public ValueResult visitList(TagType<?> entryType, int length) {
-            return ValueResult.BREAK;
+        public void visitCompound(net.minecraft.nbt.CompoundTag compound) {
+            object = compound;
         }
 
         @Override
-        public EntryResult visitEntry(TagType<?> type) {
-            return EntryResult.BREAK;
+        public void visitEnd(EndTag element) {
+            object = element;
+        }
+    }
+    static final Converter<CompoundTag, net.minecraft.nbt.CompoundTag> COMPOUND_TAG = new CompoundTagConverter();
+    private static class CompoundTagConverter implements Converter<CompoundTag, net.minecraft.nbt.CompoundTag> {
+        private Tag<?> convert(net.minecraft.nbt.Tag tag) {
+            var getter = new TagValueGetter();
+            tag.accept(getter);
+            var object = getter.object;
+            if (object instanceof Byte value) return new ValueTag<>(ValueTag.BYTE, value);
+            if (object instanceof Short value) return new ValueTag<>(ValueTag.SHORT, value);
+            if (object instanceof Integer value) return new ValueTag<>(ValueTag.INT, value);
+            if (object instanceof Long value) return new ValueTag<>(ValueTag.LONG, value);
+            if (object instanceof UUID value) return new ValueTag<>(ValueTag.UUID, value);
+            if (object instanceof Float value) return new ValueTag<>(ValueTag.FLOAT, value);
+            if (object instanceof Double value) return new ValueTag<>(ValueTag.DOUBLE, value);
+            if (object instanceof String value) return new ValueTag<>(ValueTag.STRING, value);
+            if (object instanceof byte[] value) return new ValueTag<>(ValueTag.BYTE_ARRAY, value);
+            if (object instanceof int[] value) return new ValueTag<>(ValueTag.INT_ARRAY, value);
+            if (object instanceof long[] value) return new ValueTag<>(ValueTag.LONG_ARRAY, value);
+            if (object instanceof List<?> value) {
+                var list = new ArrayList<Tag<?>>();
+                for (Object o : value) {
+                    if (o instanceof net.minecraft.nbt.Tag tag1) {
+                        list.add(convert(tag1));
+                    }
+                }
+                return new ValueTag<>(ValueTag.LIST, list);
+            }
+            if (object instanceof net.minecraft.nbt.CompoundTag tag1) return asWrapper(tag1);
+            if (object instanceof EndTag) return UnitTag.INSTANCE;
+            return null;
+        }
+        private net.minecraft.nbt.Tag convert(Tag<?> tag) {
+            var object = tag.value();
+            if (object instanceof Byte value) return ByteTag.valueOf(value);
+            if (object instanceof Short value) return ShortTag.valueOf(value);
+            if (object instanceof Integer value) return IntTag.valueOf(value);
+            if (object instanceof Long value) return LongTag.valueOf(value);
+            if (object instanceof UUID value) return NbtUtils.createUUID(value);
+            if (object instanceof Float value) return FloatTag.valueOf(value);
+            if (object instanceof Double value) return DoubleTag.valueOf(value);
+            if (object instanceof String value) return StringTag.valueOf(value);
+            if (object instanceof byte[] value) return new ByteArrayTag(value);
+            if (object instanceof int[] value) return new IntArrayTag(value);
+            if (object instanceof long[] value) return new LongArrayTag(value);
+            if (object instanceof List<?> value) {
+                var list = new ArrayList<net.minecraft.nbt.Tag>();
+                for (Object o : value) {
+                    if (o instanceof Tag<?> tag1) {
+                        list.add(convert(tag1));
+                    }
+                }
+                return new ListTag(list, (byte) 0);
+            }
+            if (object instanceof CompoundTag tag1) {
+                System.out.println(tag1);
+                return asVanilla(tag1);
+            }
+            if (object instanceof UnitTag) return EndTag.INSTANCE;
+            return null;
+        }
+        @NotNull
+        @Override
+        public net.minecraft.nbt.CompoundTag asVanilla(@NotNull CompoundTag tag) {
+            var newTag = new net.minecraft.nbt.CompoundTag();
+            tag.tags().forEach((k, v) -> {
+                var get = convert(v);
+                if (get != null) newTag.put(k, get);
+            });
+            return newTag;
         }
 
         @Override
-        public EntryResult visitEntry(TagType<?> type, String key) {
-            return EntryResult.BREAK;
-        }
-
-        @Override
-        public EntryResult visitElement(TagType<?> type, int index) {
-            return EntryResult.BREAK;
-        }
-
-        @Override
-        public ValueResult visitContainerEnd() {
-            return ValueResult.BREAK;
-        }
-
-        @Override
-        public ValueResult visitRootEntry(TagType<?> rootType) {
-            return ValueResult.BREAK;
+        public @NotNull CompoundTag asWrapper(net.minecraft.nbt.@NotNull CompoundTag compoundTag) {
+            var map = new HashMap<String, Tag<?>>();
+            compoundTag.getAllKeys().forEach(k -> {
+                var get = compoundTag.get(k);
+                if (get != null) map.put(k, convert(get));
+            });
+            return new CompoundTag(map);
         }
     }
 
@@ -366,21 +395,6 @@ final class Converters {
                     t.defaultMiningSpeed(),
                     t.damagePerBlock()
             )
-    );
-    static final Converter<CompoundTag, net.minecraft.nbt.CompoundTag> COMPOUND_TAG = Converter.of(
-            t -> {
-                var tag = new net.minecraft.nbt.CompoundTag();
-                t.tags().forEach((k, v) -> tag.put(k, TAG.asVanilla(v)));
-                return tag;
-            },
-            t -> {
-                var map = new HashMap<String, Tag<?>>();
-                t.getAllKeys().forEach(k -> {
-                    var get = t.get(k);
-                    if (get != null) map.put(k, TAG.asWrapper(get));
-                });
-                return new CompoundTag(map);
-            }
     );
     static final Converter<DyedItemColor, net.minecraft.world.item.component.DyedItemColor> DYED_ITEM_COLOR = Converter.of(
             d -> new net.minecraft.world.item.component.DyedItemColor(d.rgb(), d.showInTooltip()),
