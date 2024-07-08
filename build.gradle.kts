@@ -11,7 +11,7 @@ allprojects {
     apply(plugin = "java")
 
     group = "kr.toxicity.libraries.datacomponent"
-    version = "1.0.11"
+    version = "1.0.12"
 
     repositories {
         mavenCentral()
@@ -69,6 +69,7 @@ val dist = project("dist").paper().dependency(api)
 
 val nms = listOf(
     project("nms:v1_20_R4").paperweight(),
+    project("nms:v1_21_R1").paperweight()
 )
 
 nms.forEach {

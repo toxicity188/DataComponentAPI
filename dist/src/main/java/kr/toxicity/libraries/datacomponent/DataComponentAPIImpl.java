@@ -26,6 +26,8 @@ public final class DataComponentAPIImpl extends DataComponentAPI {
         this.current = current;
         if (current.equals(MinecraftVersionImpl.V1_20_5) || current.equals(MinecraftVersionImpl.V1_20_6)) {
             nms = new kr.toxicity.libraries.datacomponent.nms.v1_20_R4.NMSImpl();
+        } else if (current.equals(MinecraftVersionImpl.V1_21)) {
+            nms = new kr.toxicity.libraries.datacomponent.nms.v1_21_R1.NMSImpl();
         } else {
             throw new UnsupportedOperationException("Unsupported minecraft version: " + current);
         }
