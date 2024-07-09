@@ -14,6 +14,7 @@ record MinecraftVersionImpl(int first, int second, int third) implements Compara
         return COMPARATOR.compare(this, o);
     }
 
+    public static final MinecraftVersionImpl V1_21 = new MinecraftVersionImpl(1, 21, 0);
     public static final MinecraftVersionImpl V1_20_6 = new MinecraftVersionImpl(1, 20, 6);
     public static final MinecraftVersionImpl V1_20_5 = new MinecraftVersionImpl(1, 20, 5);
 

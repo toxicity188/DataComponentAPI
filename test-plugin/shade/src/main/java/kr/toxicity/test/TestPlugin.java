@@ -11,8 +11,10 @@ import kr.toxicity.libraries.datacomponent.api.NMS;
 import kr.toxicity.libraries.datacomponent.api.wrapper.*;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.BufferedWriter;
@@ -25,7 +27,11 @@ public class TestPlugin extends JavaPlugin {
     public void onEnable() {
         DataComponentAPIBukkit.load();
 
-        var apply = DataComponentAPI.api().adapter(new ItemStack(Material.NETHERITE_SWORD));
+        var beforeItem = new ItemStack(Material.NETHERITE_SWORD);
+        var meta = beforeItem.getItemMeta();
+        meta.getPersistentDataContainer().set(NamespacedKey.minecraft("hello"), PersistentDataType.STRING, "world");
+        beforeItem.setItemMeta(meta);
+        var apply = DataComponentAPI.api().adapter(beforeItem);
         apply.set(DataComponentType.DAMAGE, 3);
         apply.set(DataComponentType.REPAIR_COST, 10);
         apply.set(DataComponentType.ENCHANTMENT_GLINT_OVERRIDE, false);
@@ -33,10 +39,10 @@ public class TestPlugin extends JavaPlugin {
         apply.set(DataComponentType.CUSTOM_NAME, Component.text("World"));
         apply.set(DataComponentType.CUSTOM_MODEL_DATA, new CustomModelData(1));
 
-        var map = new HashMap<String, Tag<?>>();
-        map.put("a", new Tag<>(Tag.INT, 1));
-        map.put("b", new Tag<>(Tag.STRING, "ddd"));
-        map.put("c", new Tag<>(Tag.INT_ARRAY, new int[] {1, 2, 3}));
+        var map = apply.get(DataComponentType.CUSTOM_DATA).tag().tags();
+        map.put("a", new ValueTag<>(ValueTag.INT, 1));
+        map.put("b", new ValueTag<>(ValueTag.STRING, "ddd"));
+        map.put("c", new ValueTag<>(ValueTag.INT_ARRAY, new int[] {1, 2, 3}));
         apply.set(DataComponentType.CUSTOM_DATA, new CustomData(new CompoundTag(map)));
 
         var get = apply.build();

@@ -1,11 +1,11 @@
-package kr.toxicity.libraries.datacomponent.nms.v1_20_R4;
+package kr.toxicity.libraries.datacomponent.nms.v1_21_R1;
 
 import io.papermc.paper.adventure.PaperAdventure;
 import kr.toxicity.libraries.datacomponent.api.Converter;
 import kr.toxicity.libraries.datacomponent.api.TrimPattern;
-import kr.toxicity.libraries.datacomponent.api.wrapper.*;
 import kr.toxicity.libraries.datacomponent.api.wrapper.CompoundTag;
 import kr.toxicity.libraries.datacomponent.api.wrapper.Tag;
+import kr.toxicity.libraries.datacomponent.api.wrapper.*;
 import net.kyori.adventure.text.Component;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
@@ -194,7 +194,7 @@ final class Converters {
     }
 
     static final Converter<String, ResourceLocation> RESOURCE_LOCATION = Converter.of(
-            s -> new ResourceLocation("minecraft", s),
+            s -> ResourceLocation.tryBuild("minecraft", s),
             ResourceLocation::getPath
     );
     private static final Converter<String, MobEffect> MOB_EFFECT = Converter.of(
@@ -471,6 +471,7 @@ final class Converters {
                     f.saturation(),
                     f.canAlwaysEat(),
                     f.eatSeconds(),
+                    f.usingConvertsTo().map(CraftItemStack::asNMSCopy),
                     f.effects().stream().map(e -> new net.minecraft.world.food.FoodProperties.PossibleEffect(MOB_EFFECT_INSTANCE.asVanilla(e.effect()), e.probability())).toList()
             ),
             f -> new FoodProperties(
@@ -478,7 +479,7 @@ final class Converters {
                     f.saturation(),
                     f.canAlwaysEat(),
                     f.eatSeconds(),
-                    Optional.empty(),
+                    f.usingConvertsTo().map(CraftItemStack::asBukkitCopy),
                     f.effects().stream().map(e -> new FoodProperties.PossibleEffect(MOB_EFFECT_INSTANCE.asWrapper(e.effect()), e.probability())).toList()
             )
     );
