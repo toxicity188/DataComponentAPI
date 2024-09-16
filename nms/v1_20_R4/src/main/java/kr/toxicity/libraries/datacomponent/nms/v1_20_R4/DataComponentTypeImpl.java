@@ -74,11 +74,11 @@ final class DataComponentTypeImpl<T, R> implements kr.toxicity.libraries.datacom
             Converters.COMPONENT,
             CodecImpl.COMPONENT
     );
-    static final DataComponentTypeImpl<ItemLore, net.minecraft.world.item.component.ItemLore> ITEM_LORE = register(
-            "item_lore",
+    static final DataComponentTypeImpl<ItemLore, net.minecraft.world.item.component.ItemLore> LORE = register(
+            "lore",
             DataComponents.LORE,
-            Converters.ITEM_LORE,
-            CodecImpl.ITEM_LORE
+            Converters.LORE,
+            CodecImpl.LORE
     );
     static final DataComponentTypeImpl<Rarity, net.minecraft.world.item.Rarity> RARITY = register(
             "rarity",
