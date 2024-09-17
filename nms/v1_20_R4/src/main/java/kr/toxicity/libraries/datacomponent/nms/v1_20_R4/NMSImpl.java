@@ -55,7 +55,7 @@ public final class NMSImpl implements NMS {
 
     @Override
     public @NotNull DataComponentType<ItemLore> lore() {
-        return DataComponentTypeImpl.ITEM_LORE;
+        return DataComponentTypeImpl.LORE;
     }
 
     @Override

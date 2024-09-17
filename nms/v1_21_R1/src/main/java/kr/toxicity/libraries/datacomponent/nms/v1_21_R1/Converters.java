@@ -348,7 +348,7 @@ final class Converters {
             )
     );
 
-    static final Converter<ItemLore, net.minecraft.world.item.component.ItemLore> ITEM_LORE = Converter.of(
+    static final Converter<ItemLore, net.minecraft.world.item.component.ItemLore> LORE = Converter.of(
             l -> new net.minecraft.world.item.component.ItemLore(
                     l.lines().stream().map(COMPONENT::asVanilla).toList(),
                     l.styledLines().stream().map(COMPONENT::asVanilla).toList()

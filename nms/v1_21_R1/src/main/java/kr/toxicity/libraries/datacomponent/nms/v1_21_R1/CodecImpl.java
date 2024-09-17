@@ -32,7 +32,7 @@ final class CodecImpl<T> implements kr.toxicity.libraries.datacomponent.api.Code
     private static final RegistryOps<JsonElement> OPS = RegistryAccess.fromRegistryOfRegistries(BuiltInRegistries.REGISTRY).createSerializationContext(JsonOps.INSTANCE);
 
     static final CodecImpl<Component> COMPONENT = of(ComponentSerialization.CODEC, t -> t.stream().count() == 1 && t.getStyle().isEmpty() && t.getContents() instanceof PlainTextContents textContents ? new JsonPrimitive(textContents.text()) : new JsonObject());
-    static final CodecImpl<ItemLore> ITEM_LORE = of(ItemLore.CODEC, t -> new JsonArray());
+    static final CodecImpl<ItemLore> LORE = of(ItemLore.CODEC, t -> new JsonArray());
     static final CodecImpl<Rarity> RARITY = of(Rarity.CODEC, t -> new JsonPrimitive(t.name().toLowerCase()));
     static final CodecImpl<Unit> UNIT = of(Codec.unit(Unit.INSTANCE), t -> new JsonPrimitive(true));
     static final CodecImpl<AdventureModePredicate> ADVENTURE_MODE_PREDICATE = of(AdventureModePredicate.CODEC, t -> new JsonObject());
